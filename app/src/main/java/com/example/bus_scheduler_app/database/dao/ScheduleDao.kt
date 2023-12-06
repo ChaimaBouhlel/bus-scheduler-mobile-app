@@ -10,5 +10,5 @@ interface ScheduleDao {
     fun getAll(): List<Schedule>
 
     @Query("SELECT * FROM Schedule WHERE stop_name = :stopName")
-    fun getByStopName(stopName: String?): List<Schedule?>?
+    fun getByStopName(stopName: String): List<Schedule>
 }

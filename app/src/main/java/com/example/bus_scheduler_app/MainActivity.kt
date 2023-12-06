@@ -2,42 +2,48 @@ package com.example.bus_scheduler_app
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.lifecycle.lifecycleScope
+import android.os.Handler
+import android.os.Looper
+import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.bus_scheduler_app.database.AppDatabase
-import com.example.bus_scheduler_app.database.dao.ScheduleDao
 import com.example.bus_scheduler_app.database.entities.Schedule
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.example.bus_scheduler_app.databinding.ActivityMainBinding
+import com.example.bus_scheduler_app.viewmodels.BusScheduleViewModel
+import com.example.bus_scheduler_app.viewmodels.BusScheduleViewModelFactory
+
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var scheduleDao: ScheduleDao
-    private lateinit var busStopAdapter: BusStopAdapter
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var binding: ActivityMainBinding
+
+    private val viewModel: BusScheduleViewModel by viewModels {
+        BusScheduleViewModelFactory((application as BusScheduleApplication).database.scheduleDao())
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        // initialize Dao
-        scheduleDao = AppDatabase.getDatabase(this).scheduleDao()
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        lifecycleScope.launch {
-            val schedules: List<Schedule> = withContext(Dispatchers.IO) {
-                scheduleDao.getAll()
-            }
+        recyclerView = binding.recyclerView
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
-            // include recyclerView and adapter
-            val recyclerView: RecyclerView = findViewById(R.id.recyclerView)
-            busStopAdapter = BusStopAdapter(schedules)
-
-            // Set up the RecyclerView with a LinearLayoutManager and adapter
-            recyclerView.apply {
-                layoutManager = LinearLayoutManager(this@MainActivity)
-                adapter = busStopAdapter
-            }
+        val busStopAdapter = BusStopAdapter(emptyList()) { schedule: Schedule ->
+            println("Clicked on schedule: $schedule")
         }
+        recyclerView.adapter = busStopAdapter
+
+        var list: List<Schedule>
+        Thread {
+            // Background work
+            list = viewModel.fullSchedule()
+            // Post the result to the main thread using a Handler
+            Handler(Looper.getMainLooper()).post {
+                busStopAdapter.updateList(list)
+            }
+        }.start()
     }
 }
