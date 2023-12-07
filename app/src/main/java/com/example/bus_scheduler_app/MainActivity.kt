@@ -1,5 +1,6 @@
 package com.example.bus_scheduler_app
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -32,18 +33,14 @@ class MainActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         val busStopAdapter = BusStopAdapter(emptyList()) { schedule: Schedule ->
-            println("Clicked on schedule: $schedule")
+            val intent = Intent(this@MainActivity, DetailsActivity::class.java)
+            intent.putExtra("stopName", schedule.stopName)
+            startActivity(intent)
         }
         recyclerView.adapter = busStopAdapter
 
-        var list: List<Schedule>
-        Thread {
-            // Background work
-            list = viewModel.fullSchedule()
-            // Post the result to the main thread using a Handler
-            Handler(Looper.getMainLooper()).post {
-                busStopAdapter.updateList(list)
-            }
-        }.start()
+        viewModel.fullSchedule().observe(this) {
+            busStopAdapter.updateList(it)
+        }
     }
 }
