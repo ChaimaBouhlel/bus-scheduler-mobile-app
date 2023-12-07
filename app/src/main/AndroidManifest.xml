@@ -15,16 +15,21 @@
         tools:targetApi="31">
         <activity
             android:name=".MainActivity"
+            android:label="Main Activity">
+        </activity>
+        <activity
+            android:name=".DetailsActivity"
+            android:label="Details Activity">
+        </activity>
+        <activity 
+            android:name=".NewMainActivity"
+            android:label="New Main Activity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".DetailsActivity"
-            android:label="Details Activity">
         </activity>
     </application>
 

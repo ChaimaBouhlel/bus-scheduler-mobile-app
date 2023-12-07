@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/scheduleListFragment">
+
+    <fragment
+        android:id="@+id/scheduleListFragment"
+        android:name="com.example.bus_scheduler_app.ScheduleListFragment"
+        android:label="schedule_list_fragment"
+        tools:layout="@layout/schedule_list_fragment" >
+        <action
+            android:id="@+id/action_scheduleListFragment_to_detailsFragment"
+            app:destination="@id/detailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/detailsFragment"
+        android:name="com.example.bus_scheduler_app.DetailsFragment"
+        android:label="details_fragment"
+        tools:layout="@layout/details_fragment" >
+        <argument
+            android:name="stopName"
+            app:argType="string" />
+    </fragment>
+</navigation>
